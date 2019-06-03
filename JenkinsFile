@@ -1,0 +1,32 @@
+
+
+pipeline {
+    agent any
+    tools {
+        maven 'Maven 3.3.9'
+        jdk 'jdk11' 
+    }
+    stages {
+        stage ('Initialize') {
+            steps {
+                sh '''
+                    echo "Init"
+                ''' 
+            }
+        }
+
+        stage ('Build') {
+            steps {
+                sh 'mvn -Dmaven.test.failure.ignore=true install' 
+            }
+            post {
+                success {
+                    junit 'target/surefire-reports/**/*.xml'
+                    build job: 'Toto', parameters: [string(name: 'message', value: 'Coucou')]
+                }
+            }
+        }
+    }
+}
+
+
